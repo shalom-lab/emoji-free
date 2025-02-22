@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emoji 搜索与展示</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+            min-height: 100vh;  /* 最小高度设为视口高度 */
+        }
+
+        .search-container {
+            text-align: center;
+            margin: 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: #f5f5f5;
+            padding: 15px 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        #searchInput {
+            width: 300px;
+            padding: 12px;
+            font-size: 16px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+        }
+
+        .emoji-list {
+            display: flex;  /* 改用flex布局 */
+            gap: 15px;
+            padding: 15px;
+        }
+
+        .column {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .emoji-item {
+            background: white;
+            padding: 12px;  /* 统一内边距 */
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;  /* 改为纵向排列 */
+            min-width: 0;
+            box-sizing: border-box;
+        }
+
+        .keyword {
+            font-weight: bold;
+            color: #333;
+            font-size: 14px;
+            margin-bottom: 8px;  /* 添加下边距 */
+            padding: 0;  /* 移除原有的padding */
+        }
+
+        .emojis {
+            font-size: 22px;
+            letter-spacing: 1px;
+            word-break: break-all;
+            word-wrap: break-word;
+            line-height: 32px;
+            text-align: left;  /* 确保emoji左对齐 */
+        }
+
+        /* 响应式布局 */
+        @media (max-width: 1200px) {
+            .emoji-list {
+                grid-template-columns: repeat(2, 1fr);  /* 中等屏幕显示2列 */
+            }
+        }
+
+        @media (max-width: 768px) {
+            .emoji-list {
+                grid-template-columns: 1fr;  /* 小屏幕显示1列 */
+            }
+            .keyword {
+                min-width: 100px;  /* 小屏幕时可以适当增加关键词宽度 */
+            }
+        }
+    </style>
+    <!-- 添加 grapheme-splitter 库 -->
+    <script src="https://cdn.jsdelivr.net/npm/grapheme-splitter@1.0.4/index.js"></script>
+</head>
+
+<body>
+    <div class="search-container">
+        <input type="text" id="searchInput" placeholder="搜索 Emoji...">
+    </div>
+    <div id="emojiList" class="emoji-list"></div>
+
+    <script>
+        window.emojiCallback = function(response) {
+            const emojiData = response.data;
+            const splitter = new GraphemeSplitter();
+            
+            // 解析emoji数据
+            function loadEmojis() {
+                const emojis = emojiData.split('\n')
+                    .filter(line => line.trim())
+                    .map(line => {
+                        // 特殊处理 :(, :) 和 :D 这三种表情
+                        if (line.startsWith(':(') || line.startsWith(':)') || line.startsWith(':D')) {
+                            const [keyword, emojis] = line.split(' : ').map(s => s.trim());
+                            return { keyword, emojis };
+                        } else {
+                            const [keyword, emojis] = line.split(':').map(s => s.trim());
+                            return { keyword, emojis };
+                        }
+                    });
+                
+                // 打印解析后的数据
+                console.log('Parsed Emoji Database:', JSON.stringify(emojis, null, 2));
+                return emojis;
+            }
+
+            // 渲染函数
+            function renderEmojis(emojiList, searchTerm = '') {
+                const container = document.getElementById('emojiList');
+                container.innerHTML = '';
+                
+                const columns = Array.from({ length: 4 }, () => {
+                    const column = document.createElement('div');
+                    column.className = 'column';
+                    container.appendChild(column);
+                    return column;
+                });
+                
+                const EMOJIS_PER_ROW = 13;    // 每行显示13个emoji
+                const SINGLE_ROW_HEIGHT = 32;  // 单行高度
+                const PADDING = 24;            // 上下内边距总和
+                const KEYWORD_HEIGHT = 22;     // keyword所占高度
+
+                let columnIndex = 0;
+
+                emojiList
+                    .filter(({keyword}) => 
+                        keyword.toLowerCase().includes(searchTerm.toLowerCase())
+                    )
+                    .forEach(({keyword, emojis}) => {
+                        const emojiCount = splitter.splitGraphemes(emojis).length;
+                        const contentRows = Math.floor(emojiCount / EMOJIS_PER_ROW) + (emojiCount % EMOJIS_PER_ROW > 0 ? 1 : 0);
+                        // 总高度 = keyword高度 + emoji内容高度 + 内边距
+                        const height = KEYWORD_HEIGHT + (SINGLE_ROW_HEIGHT * contentRows) + PADDING;
+
+                        const div = document.createElement('div');
+                        div.className = 'emoji-item';
+                        div.style.height = `${height}px`;
+                        div.innerHTML = `
+                            <div class="keyword">${keyword}</div>
+                            <div class="emojis">${emojis}</div>
+                        `;
+
+                        columns[columnIndex].appendChild(div);
+                        columnIndex = (columnIndex + 1) % 4;
+                    });
+            }
+
+            // 初始化
+            function init() {
+                const emojiList = loadEmojis();
+                renderEmojis(emojiList);
+
+                // 搜索功能
+                document.getElementById('searchInput').addEventListener('input', (e) => {
+                    renderEmojis(emojiList, e.target.value);
+                });
+            }
+
+            init();
+        };
+    </script>
+    <script src="emoji-data.js"></script>
+</body>
+
+</html>
