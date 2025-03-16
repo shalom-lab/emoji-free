@@ -1,4 +1,4 @@
-# 🎯 Emoji Hub
+# 🎯 Emoji Free
 
 > A Chrome extension for quickly searching and finding emoji expressions.
 
