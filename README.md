@@ -11,6 +11,9 @@
   <img src="https://img.shields.io/badge/license-MIT-green.svg" alt="License">
   <img src="https://img.shields.io/badge/chrome-v88+-brightgreen.svg" alt="Chrome Version">
 </p>
+<p align="center">
+  <img src="images/promo-large.png">
+</p>
 
 ## ✨ Features
 
@@ -19,6 +22,9 @@
 - 📚 Support for all standard emoji categories
 - ⚡️ Real-time search results
 - 🔄 Multiple emoji display formats
+
+
+
 
 ## 📦 Installation
 
