@@ -24,19 +24,12 @@
 - 🔄 Multiple emoji display formats
 
 
-
-
 ## 📦 Installation
 
-### From Chrome Web Store
-1. Visit the [Chrome Web Store](https://chrome.google.com/webstore)
-2. Search for "Emoji Hub"
-3. Click "Add to Chrome"
-
-### Manual Installation (Developer Mode)
+### Manual Installation
 1. Download or clone this repository
    ```bash
-   git clone https://github.com/yourusername/emoji-hub.git
+   git clone https://github.com/shalom-lab/emoji-free.git
    ```
 2. Open Chrome and navigate to `chrome://extensions/`
 3. Enable "Developer mode" in the top right
@@ -48,6 +41,10 @@
 1. Click the Emoji Hub icon in your Chrome toolbar
 2. Type in the search box to find emojis
 3. Browse through categories or search by keywords
-4. Click on any emoji to copy it to your clipboard
+4. Copy it to your clipboard
 
-## 📁 File Structure 
+## 🙏 Acknowledgments
+
+This project uses emoji data from:
+- [hadley/emo](https://github.com/hadley/emo) - R package for easily inserting emoji
+- [muan/emojilib](https://github.com/muan/emojilib/) - Emoji keyword library
